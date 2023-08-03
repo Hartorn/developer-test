@@ -12,7 +12,7 @@ function ScenarioDisplay({ targetUrl }) {
   };
   const onUploadError = (err) => {
     setOdds(undefined);
-    setError(String(err));
+    setError(err === undefined ? undefined : String(err));
   };
 
   return (
