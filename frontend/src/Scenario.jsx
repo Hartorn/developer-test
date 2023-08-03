@@ -23,7 +23,7 @@ function ScenarioDisplay({ targetUrl }) {
         onUploadError={onUploadError}
         targetUrl={targetUrl}
       />
-      {odds && <h3>Odds: {Math.round(odds * 100)}%</h3>}
+      {odds !== undefined && <h3>Odds: {Math.round(odds * 100)}%</h3>}
       {error && (
         <h3>Something went wrong, did you upload a proper file ? : {error}</h3>
       )}
