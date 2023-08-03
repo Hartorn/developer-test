@@ -1,6 +1,7 @@
 default: help;
 
 SVC_BACKEND=backend
+SVC_FRONTEND=frontend
 
 # Hidden commands, to be used as deps
 _env: ## Build .env with needed info for docker compose
@@ -26,7 +27,11 @@ stop: ## Stop and remove all the containers
 
 backend: _build ## Open a bash inside the backend container
 	docker compose run --rm ${SVC_BACKEND} poetry shell
-.PHONY: bash_backend
+.PHONY: backend
+
+frontend: _build ## Open a bash inside the backend container
+	docker compose run --rm ${SVC_FRONTEND} sh
+.PHONY: frontend
 
 cli: _build ## Launch the cli of the backend
 	docker compose run --rm ${SVC_BACKEND} poetry run python ./src/backend/cli.py ${args}
@@ -34,6 +39,7 @@ cli: _build ## Launch the cli of the backend
 
 setup: _build ## Build and install the dependencies
 	docker compose run --rm ${SVC_BACKEND} poetry install --sync
+	docker compose run --rm ${SVC_FRONTEND} npm ci
 .PHONY: setup
 
 test: ## Launch unit tests
