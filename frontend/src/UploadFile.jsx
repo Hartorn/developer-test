@@ -8,6 +8,7 @@ function UploadFile({ onUploadSuccess, onUploadError, targetUrl }) {
   const handleFileChange = (e) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
+      onUploadSuccess(undefined);
     }
   };
 
