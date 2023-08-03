@@ -1,5 +1,18 @@
 #https://docs.docker.com/compose/compose-file/
 services:
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    volumes:
+      - ./original/resources:/data/resources:ro
+      - ./frontend:/work/frontend
+    working_dir: /work/frontend
+    command: npm run dev
+    networks:
+      - odds
+    ports:
+      - 5173:5173
   backend:
     build:
       context: ./backend
