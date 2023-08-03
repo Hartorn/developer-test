@@ -49,15 +49,18 @@ test: ## Launch unit tests
 format: ## Format all files inside backend with black & isort
 	docker compose run --rm ${SVC_BACKEND} poetry run black .
 	docker compose run --rm ${SVC_BACKEND} poetry run isort .
+	docker compose run --rm ${SVC_FRONTEND} npm run format
 .PHONY: format
 
 check_format: ## Format all files inside backend with black & isort
 	docker compose run --rm ${SVC_BACKEND} poetry run black --check .
 	docker compose run --rm ${SVC_BACKEND} poetry run isort -c .
+	docker compose run --rm ${SVC_FRONTEND} npm run check-format
 .PHONY: check_format
 
 check_linting: ## Verify code with lint tools, like pylint
 	docker compose run --rm ${SVC_BACKEND} poetry run pylint ./src/backend
+	docker compose run --rm ${SVC_FRONTEND} npm run lint
 .PHONY: check_format
 
 help: ## Display commands help
