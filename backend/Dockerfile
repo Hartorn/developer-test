@@ -46,3 +46,24 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Switch to new user
 USER ${USERNAME}
+
+FROM base as prod
+
+# Create user
+RUN useradd --uid 1000 -m jedi -d /home/jedi && mkdir -p /jedi && chown -R jedi /jedi
+
+WORKDIR /jedi
+USER jedi
+
+
+COPY ./src ./src
+COPY ./poetry.lock ./poetry.lock
+COPY ./pyproject.toml ./pyproject.toml
+COPY ./poetry.toml ./poetry.toml
+COPY ./README.md ./README.md
+COPY ./log_config.json ./log_config.json
+
+RUN poetry install --sync --only=main
+
+ENTRYPOINT [ "poetry", "run"]
+CMD [ "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1" ]

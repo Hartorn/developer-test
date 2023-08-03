@@ -39,3 +39,33 @@ Incorrect one
 ```shell
 make cli args="/data/examples/example1/empire.json /data/examples/example1/empire.json"
 ```
+
+# Testing production images
+
+To test production image, first build them using 
+```shell
+make build
+```
+
+Then you can test the backend locally by doing 
+```shell
+docker run -it --rm -p 8000:8000 -e CONFIG_PATH=/examples/example1/millennium-falcon.json -v ${PWD}/original/examples:/examples jedi-backend
+```
+and then go to http://localhost:8000/docs
+
+Else you can just run
+
+```shell
+make up_prod
+```
+and go to the same url as for dev
+- http://proxy.odds.localhost
+- http://app.odds.localhost/
+- http://backend.odds.localhost/docs
+
+To change the configuration used, change the env variable `CONFIG_PATH` inside the docker-compose.
+
+You can also run 
+```shell
+make cli_prod args="/examples/example1/millennium-falcon.json /examples/example1/empire.json"
+```
