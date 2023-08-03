@@ -12,58 +12,34 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
-      - odds
+      - odds_prod
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.proxy.rule=Host(`proxy.odds.localhost`)"
       - "traefik.http.routers.proxy.entrypoints=web"
       - "traefik.http.services.proxy.loadbalancer.server.port=8080"
   frontend:
-    build:
-      context: ./frontend
-      target: dev
-      args:
-        - USERNAME=${USERNAME}
-        - USER_UID=${USER_UID}
-        - USER_GID=${USER_GID}
-        - HOME_DIR=${HOME_DIR}
-    volumes:
-      - ./original/resources:/data/resources:ro
-      - ./frontend:/work/frontend
-    working_dir: /work/frontend
-    command: npm run dev
+    image: odds-frontend:latest
     networks:
-      - odds
-    environment:
-      - VITE_BACKEND_URL=http://backend.odds.localhost
+      - odds_prod
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`app.odds.localhost`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
   backend:
-    build:
-      context: ./backend
-      target: dev
-      args:
-        - USERNAME=${USERNAME}
-        - USER_UID=${USER_UID}
-        - USER_GID=${USER_GID}
-        - HOME_DIR=${HOME_DIR}
+    image: odds-backend:latest
     environment:
-      - CONFIG_PATH=/data/examples/example1/millennium-falcon.json
-    command: poetry run uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+      - CONFIG_PATH=/examples/example2/millennium-falcon.json
     networks:
-      - odds
+      - odds_prod
     volumes:
-      - ./original/examples:/data/examples:ro
-      - ./backend:/work/backend
-    working_dir: /work/backend
+      - ./original/examples:/examples:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`backend.odds.localhost`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 networks:
-  odds:
+  odds_prod:
     driver: bridge

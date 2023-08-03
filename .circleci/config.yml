@@ -94,6 +94,14 @@ jobs:
           - run:
                 name: Run check_linting
                 command: make check_linting
+  build:
+      executor: dck-executor
+      steps:
+          - checkout
+          # Download and cache dependencies
+          - run:
+                name: Run build
+                command: make build
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -110,3 +118,4 @@ workflows:
       - check-format:
             requires:
                 - install
+      - build
