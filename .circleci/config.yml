@@ -23,16 +23,26 @@ jobs:
     # Download and cache dependencies
     - restore_cache:
           keys:
-              - v1-dependencies-{{ checksum "backend/poetry.lock" }}
+              - deps-backend-{{ checksum "backend/poetry.lock" }}
               # fallback to using the latest cache if no exact match is found
-              - v1-dependencies-
+              - deps-backend
+    - restore_cache:
+          keys:
+              - deps-frontend-{{ checksum "frontend/package-lock.json" }}
+              # fallback to using the latest cache if no exact match is found
+              - deps-frontend
     - run:
         name: Build docker & installation of dependencies
         command: make setup
     - save_cache:
           paths:
               - ./backend/.venv
-          key: v1-dependencies-{{ checksum "backend/poetry.lock" }}
+          key: deps-backend-{{ checksum "backend/poetry.lock" }}
+    - save_cache:
+          paths:
+              - ./frontend/node_modules
+          key: deps-frontend-{{ checksum "frontend/package-lock.json" }}
+
   unit-tests:
       executor: dck-executor
       steps:
@@ -40,7 +50,10 @@ jobs:
           # Download and cache dependencies
           - restore_cache:
                 keys:
-                    - v1-dependencies-{{ checksum "backend/poetry.lock" }}
+                    - deps-backend-{{ checksum "backend/poetry.lock" }}
+          - restore_cache:
+                keys:
+                    - deps-frontend-{{ checksum "frontend/package-lock.json" }}
           - run:
               name: Force recreation of .env
               command: make _env
@@ -54,7 +67,10 @@ jobs:
           # Download and cache dependencies
           - restore_cache:
                 keys:
-                    - v1-dependencies-{{ checksum "backend/poetry.lock" }}
+                    - deps-backend-{{ checksum "backend/poetry.lock" }}
+          - restore_cache:
+                keys:
+                    - deps-frontend-{{ checksum "frontend/package-lock.json" }}
           - run:
               name: Force recreation of .env
               command: make _env
@@ -68,7 +84,10 @@ jobs:
           # Download and cache dependencies
           - restore_cache:
                 keys:
-                    - v1-dependencies-{{ checksum "backend/poetry.lock" }}
+                    - deps-backend-{{ checksum "backend/poetry.lock" }}
+          - restore_cache:
+                keys:
+                    - deps-frontend-{{ checksum "frontend/package-lock.json" }}
           - run:
               name: Force recreation of .env
               command: make _env
