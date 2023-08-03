@@ -8,7 +8,11 @@ The `Makefile` is self documented, to know what is available just do `make` or `
 - `make setup`
 
 # Server (backend & frontend)
-Once started, backend UI should be available as [SwaggerUI](http://127.0.0.1:8000/docs) or [Redocs](http://127.0.0.1:8000/redoc)
+Once started, backend UI should be available as [SwaggerUI](http://backend.odds.localhost/docs) or [Redocs](http://backend.odds.localhost/redoc)
+
+Proxy is available at http://proxy.odds.localhost
+
+Application is available at http://app.odds.localhost/
 
 ## Start everything
 - `make up`

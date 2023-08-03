@@ -1,5 +1,23 @@
 #https://docs.docker.com/compose/compose-file/
 services:
+  proxy:
+    image: "traefik:latest"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - odds
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.proxy.rule=Host(`proxy.odds.localhost`)"
+      - "traefik.http.routers.proxy.entrypoints=web"
+      - "traefik.http.services.proxy.loadbalancer.server.port=8080"
   frontend:
     build:
       context: ./frontend
@@ -11,8 +29,13 @@ services:
     command: npm run dev
     networks:
       - odds
-    ports:
-      - 5173:5173
+    environment:
+      - VITE_BACKEND_URL=http://backend.odds.localhost
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`app.odds.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
   backend:
     build:
       context: ./backend
@@ -25,14 +48,17 @@ services:
     environment:
       - CONFIG_PATH=/data/examples/example1/millennium-falcon.json
     command: poetry run uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-    ports:
-      - 8000:8000
     networks:
       - odds
     volumes:
       - ./original/examples:/data/examples:ro
       - ./backend:/work/backend
     working_dir: /work/backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`backend.odds.localhost`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
 networks:
   odds:
     driver: bridge
